@@ -1,0 +1,25 @@
+---
+version: '2.1'
+
+services:
+  db:
+    image: postgres:12.6
+    command: -c fsync=off -c full_page_writes=off
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 1s
+      timeout: 1s
+      retries: 60
+  web:
+    image: ${CI_REGISTRY:-registry.slurm.io}/${CI_PROJECT_NAMESPACE:-slurm}/${CI_PROJECT_NAME:-demo}:${CI_COMMIT_REF_SLUG:-local}.${CI_PIPELINE_ID:-1}
+    environment:
+      DB_NAME: test
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy

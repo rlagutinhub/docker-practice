@@ -1,0 +1,10 @@
+---
+version: '2.1'
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
